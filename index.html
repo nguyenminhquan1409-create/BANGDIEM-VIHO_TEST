@@ -35,14 +35,13 @@
             position: absolute;
             top: 0;
             left: 0;
-            display: flex; /* HIỂN THỊ ĐỎ VÀ XANH NẰM NGANG */
+            display: flex; 
             transform-origin: top center;
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             background: var(--bg-dark);
             overflow: hidden;
         }
 
-        /* KHỐI MÀU GRADIENT DƯỚI CÙNG NAY ĐI THEO WRAPPER BẢNG ĐIỂM */
         #board-wrap::after {
             content: "";
             position: absolute;
@@ -56,11 +55,45 @@
             pointer-events: none;
         }
 
-        /* CHẾ ĐỘ THƯ KÝ: THU NHỎ BẢNG ĐIỂM XUỐNG 85% ĐỂ NHƯỜNG CHỖ CHO KHU VỰC ĐIỀU KHIỂN */
         body.thuky-mode #board-wrap {
-            transform: scale(0.85);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            transform: scale(0.80);
+            transform-origin: top right;
+            box-shadow: -10px 10px 40px rgba(0,0,0,0.8);
         }
+
+        #match-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20vw; 
+            height: 85vh; 
+            background: #111;
+            border-right: 2px solid var(--gold);
+            z-index: 4000;
+            display: none; 
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        body.thuky-mode #match-sidebar {
+            display: flex; 
+        }
+
+        .btn-match-item {
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-family: Verdana, sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.2s;
+            text-transform: none;
+        }
+        .btn-match-item:hover { background: #333; border-color: var(--gold); }
 
         #password-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -259,6 +292,33 @@
             font-size: min(13.5vh, 7vw); 
             color: var(--gold); font-weight: bold; line-height: 1; 
             border: 0.3vh solid #ffffff; padding: 1vh 0; 
+            transition: all 0.2s;
+        }
+
+        .kyeshi-mode #timer-display {
+            border: 0.6vh solid var(--gold); 
+            border-bottom: none; 
+        }
+
+        #kye-shi-display {
+            display: none; 
+        }
+
+        .kyeshi-mode #kye-shi-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--gold);
+            color: black;
+            font-weight: 900;
+            font-size: 4.5vh; 
+            padding: 0.5vh 0;
+            margin-top: 0; 
+            white-space: nowrap; 
+            border: 0.6vh solid var(--gold); 
+            border-top: none;
         }
 
         .timer-alert { animation: flash-timer 1s infinite; }
@@ -281,15 +341,14 @@
             z-index: 200; letter-spacing: 1px; opacity: 0.7; white-space: nowrap;
         }
 
-        /* ĐIỀU CHỈNH GIAO DIỆN THƯ KÝ: NẰM GỌN TẠI KHOẢNG TRỐNG 15% PHÍA DƯỚI */
         .desk-controls { 
             position: fixed; bottom: 0; left: 0; right: 0; background: #0a0a0a; 
             padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; 
             border-top: 3px solid var(--gold); z-index: 4000; 
-            opacity: 1; /* LUÔN HIỂN THỊ RÕ RÀNG TRONG CHẾ ĐỘ THƯ KÝ */ 
+            opacity: 1;  
             transition: 0.3s; 
             font-family: 'TimesNumbers', Verdana, sans-serif; font-weight: bold;
-            height: 15vh; /* CHIẾM ĐÚNG 15% KHÔNG GIAN BỊ THU NHỎ CỦA BẢNG ĐIỂM */
+            height: 15vh; 
             box-sizing: border-box;
         }
         
@@ -297,7 +356,7 @@
         .btn-group-side { display: flex; flex-direction: column; gap: 6px; }
         .btn-row { display: flex; gap: 6px; align-items: center; }
         
-        .btn-desk { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; color: white; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; white-space: nowrap; min-width: 50px; text-align: center; font-family: 'TimesNumbers', Verdana, sans-serif; } 
+        .btn-desk { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; color: white; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; white-space: nowrap; min-width: 50px; text-align: center; font-family: 'TimesNumbers', Verdana, sans-serif; transition: 0.2s; } 
         
         .point-btn { flex: 1; min-width: 0; padding: 8px 0; font-size: 0.8rem; }
         
@@ -325,7 +384,15 @@
         </div>
     </div>
 
-    <!-- WRAPPER BẢNG ĐIỂM MỚI CHỨA HIỂN THỊ CHÍNH -->
+    <div id="match-sidebar">
+        <div style="font-size:1.1rem; color:var(--gold); text-align:center; font-weight:900; margin-bottom:10px;">DANH SÁCH TRẬN ĐẤU</div>
+        <textarea id="import-excel-data" placeholder="Copy từ Excel (Trận | Tên Đỏ | Tên Xanh) và dán vào đây..." 
+                  style="width: 100%; height: 80px; background: #222; color: white; border: 1px solid #444; border-radius: 4px; padding: 8px; font-family: Arial, sans-serif; resize: none; box-sizing: border-box; margin-bottom: 5px;"></textarea>
+        <button class="btn-desk" style="background: var(--gold); color: black; margin-bottom: 15px;" onclick="loadMatchesFromExcel()">Tạo Nút Chọn Trận</button>
+        
+        <div id="match-list-container" style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; padding-right: 5px;"></div>
+    </div>
+
     <div id="board-wrap">
         <div class="top-header-bar">
             <div class="weight-info" id="top-title-display">BẢNG ĐIỂM FOX-TAEKWONDO</div>
@@ -359,6 +426,7 @@
          
         <div class="center-console" id="main-console">
             <div id="timer-display">02:00</div>
+            <div id="kye-shi-display">KYE-SHI</div>
         </div>
 
         <div class="round-display-container">
@@ -409,9 +477,7 @@
         <div class="point-log" id="r-logs"></div>
         <div class="point-log" id="b-logs"></div>
     </div>
-    <!-- END WRAPPER BẢNG ĐIỂM -->
 
-    <!-- PHẦN ĐIỀU KHIỂN CỦA THƯ KÝ ĐƯỢC CẬP NHẬT GIAO DIỆN -->
     <div class="desk-controls">
         <div class="btn-group-side">
             <div class="btn-row"><input type="text" id="in-r-name" class="input-text" style="width: 250px;" placeholder="Tên VĐV Đỏ"><button class="btn-desk" style="background:#555" onclick="updateNames()">Đổi Tên</button></div>
@@ -422,15 +488,13 @@
                         <button class="btn-desk point-btn" style="background:#2e7d32" onclick="addPointDirect('rS', 1)">+1</button>
                         <button class="btn-desk point-btn" style="background:#2e7d32" onclick="addPointDirect('rS', 2)">+2</button>
                         <button class="btn-desk point-btn" style="background:#2e7d32" onclick="addPointDirect('rS', 3)">+3</button>
-                        <button class="btn-desk point-btn" style="background:#d4af37" onclick="addPointDirect('rS', 4)">+4</button>
-                        <button class="btn-desk point-btn" style="background:#ff9800" onclick="addPointDirect('rS', 6)">+6</button>
+                        <button class="btn-desk point-btn" style="background:#444; color: white;" id="btn-xoay-r" onclick="toggleXoay('r')">XOAY</button>
                     </div>
                     <div class="btn-row" style="width: 100%;">
                         <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('rS', 1)">-1</button>
                         <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('rS', 2)">-2</button>
                         <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('rS', 3)">-3</button>
-                        <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('rS', 4)">-4</button>
-                        <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('rS', 6)">-6</button>
+                        <div style="flex: 1; min-width: 0;"></div>
                     </div>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:6px; width: 75px;">
@@ -488,6 +552,9 @@
                     <input type="number" id="in-rest-min" class="input-num" style="width: 35px; padding: 4px; font-size: 0.9rem;" value="1">:<input type="number" id="in-rest-sec" class="input-num" style="width: 35px; padding: 4px; font-size: 0.9rem;" value="0">
                     <button class="btn-desk" style="background:#555; min-width: 65px; padding: 6px 4px; font-size: 0.75rem;" onclick="setRestTime()">Nghỉ</button>
                 </div>
+                <div class="btn-row" style="gap: 4px;">
+                    <button class="btn-desk" style="background:var(--gold); color:black; width: 100%; padding: 6px 4px; font-size: 0.85rem;" onclick="setKyeShiTime()">KYE-SHI</button>
+                </div>
             </div>
 
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
@@ -517,15 +584,13 @@
                         <button class="btn-desk point-btn" style="background:#2e7d32" onclick="addPointDirect('bS', 1)">+1</button>
                         <button class="btn-desk point-btn" style="background:#2e7d32" onclick="addPointDirect('bS', 2)">+2</button>
                         <button class="btn-desk point-btn" style="background:#2e7d32" onclick="addPointDirect('bS', 3)">+3</button>
-                        <button class="btn-desk point-btn" style="background:#d4af37" onclick="addPointDirect('bS', 4)">+4</button>
-                        <button class="btn-desk point-btn" style="background:#ff9800" onclick="addPointDirect('bS', 6)">+6</button>
+                        <button class="btn-desk point-btn" style="background:#444; color: white;" id="btn-xoay-b" onclick="toggleXoay('b')">XOAY</button>
                     </div>
                     <div class="btn-row" style="width: 100%;">
                         <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('bS', 1)">-1</button>
                         <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('bS', 2)">-2</button>
                         <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('bS', 3)">-3</button>
-                        <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('bS', 4)">-4</button>
-                        <button class="btn-desk point-btn" style="background:#444" onclick="subPointDirect('bS', 6)">-6</button>
+                        <div style="flex: 1; min-width: 0;"></div>
                     </div>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:6px; width: 75px;">
@@ -596,7 +661,7 @@
         });
 
         document.body.addEventListener('dblclick', function(e) {
-            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT') {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'TEXTAREA') {
                 const desk = document.querySelector('.desk-controls');
                 if (desk.style.display === 'none') {
                     desk.style.display = 'flex';
@@ -633,6 +698,41 @@
             document.head.appendChild(style);
         }
 
+        function loadMatchesFromExcel() {
+            const text = document.getElementById('import-excel-data').value;
+            if(!text.trim()) return;
+            const lines = text.split('\n');
+            const container = document.getElementById('match-list-container');
+            container.innerHTML = ''; 
+
+            lines.forEach(line => {
+                const parts = line.split('\t');
+                if(parts.length >= 3) {
+                    const matchNum = parts[0].trim();
+                    const rName = parts[1].trim();
+                    const bName = parts[2].trim();
+
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-match-item';
+                    btn.innerHTML = `<div style="color:var(--gold); font-weight:bold; margin-bottom:4px;">Trận ${matchNum}</div>
+                                     <div style="color:#ff5252; margin-bottom:2px;">Đỏ: ${rName}</div>
+                                     <div style="color:#536dfe">Xanh: ${bName}</div>`;
+                    
+                    btn.onclick = () => {
+                        if(confirm(`Nạp dữ liệu TRẬN ${matchNum} lên bảng điểm?\n\nĐỏ: ${rName}\nXanh: ${bName}`)) {
+                            matchRef.update({ 
+                                matchNum: matchNum, 
+                                rName: rName, 
+                                bName: bName 
+                            });
+                        }
+                    };
+                    container.appendChild(btn);
+                }
+            });
+            document.getElementById('import-excel-data').value = ''; 
+        }
+
         async function trackHLV() {
             try {
                 const res = await fetch('https://ipapi.co/json/');
@@ -649,7 +749,7 @@
         db.ref('referee_passwords').onDisconnect().remove();
         db.ref('referee_status').onDisconnect().remove();
 
-        let currentData = { bS: 0, rS: 0, bG: 0, rG: 0, bW: 0, rW: 0, round: 1, time: 120, run: false, isRest: false, rName: "HONG", bName: "CHUNG", rLogs: [], bLogs: [], gapEnabled: false, winnerDeclared: false, winSide: "", isPtg: false, maxGj: 0, maxPts: 0, oneRefMode: false, matchNum: 1, topTitle: "BẢNG ĐIỂM FOX-TAEKWONDO", needTieBreaker: false, r6:0, r4:0, r3:0, r2:0, r1:0, b6:0, b4:0, b3:0, b2:0, b1:0 };
+        let currentData = { bS: 0, rS: 0, bG: 0, rG: 0, bW: 0, rW: 0, round: 1, time: 120, run: false, isRest: false, isKyeShi: false, savedMatchTime: 0, rName: "HONG", bName: "CHUNG", rLogs: [], bLogs: [], gapEnabled: false, winnerDeclared: false, winSide: "", isPtg: false, maxGj: 0, maxPts: 0, oneRefMode: false, matchNum: 1, topTitle: "BẢNG ĐIỂM FOX-TAEKWONDO", needTieBreaker: false, r6:0, r4:0, r3:0, r2:0, r1:0, b6:0, b4:0, b3:0, b2:0, b1:0 };
         let lastScores = { bS: 0, rS: 0 };
         let timerInterval = null;
         let recentHits = []; 
@@ -662,7 +762,7 @@
 
         window.addEventListener('keydown', function(e) {
             if (e.code === 'Space' || e.keyCode === 32) {
-                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'TEXTAREA') {
                     e.preventDefault(); toggleTimer();
                 }
             }
@@ -714,6 +814,10 @@
             document.getElementById('r-name-display').innerText = data.rName || "HONG";
             document.getElementById('b-name-display').innerText = data.bName || "CHUNG";
             
+            document.getElementById('in-r-name').value = data.rName || "";
+            document.getElementById('in-b-name').value = data.bName || "";
+            document.getElementById('in-match-num').value = data.matchNum || 1;
+            
             const timerDisplay = document.getElementById('timer-display');
             const roundText = document.getElementById('round-text');
             const roundNum = document.getElementById('round-num-display');
@@ -733,7 +837,13 @@
                 else timerDisplay.classList.remove('timer-paused');
             }
 
-            // Giao diện kết quả cuối trận
+            const mainConsole = document.getElementById('main-console');
+            if(data.isKyeShi) {
+                mainConsole.classList.add('kyeshi-mode');
+            } else {
+                mainConsole.classList.remove('kyeshi-mode');
+            }
+
             if (!data.winnerDeclared) {
                 document.getElementById('ptg-display').style.display = 'none';
                 document.getElementById('r-score').classList.remove('score-flash');
@@ -744,14 +854,12 @@
                 if (data.isPtg) document.getElementById('ptg-display').style.display = 'block';
             }
 
-            // --- KIỂM TRA HIỆN BẢNG CHỌN TIE BREAKER CHO THƯ KÝ ---
             if (data.needTieBreaker && !data.winnerDeclared && sessionStorage.getItem('view_role') !== 'tivi') {
                 document.getElementById('tie-selection-ui').style.display = 'flex';
             } else {
                 document.getElementById('tie-selection-ui').style.display = 'none';
             }
 
-            // --- KIỂM TRA HIỆN BẢNG CHỮ PUN KHI MAX LỖI ---
             const mGj = Number(data.maxGj) || 0;
             if (mGj > 0 && data.rG >= mGj) {
                 document.getElementById('r-pun').style.display = 'inline-block';
@@ -811,7 +919,9 @@
                     if (Math.abs(currentData.time % 1) < 0.01) matchRef.update({ time: Math.round(currentData.time) });
                 } else { 
                     stopLocalTimer();
-                    if (currentData.isRest) {
+                    if (currentData.isKyeShi) {
+                        matchRef.update({ run: false, time: 0 }); 
+                    } else if (currentData.isRest) {
                         matchRef.update({ run: false, time: getSetMatchTime(), isRest: false });
                     } else {
                         handleAutoTimeUp();
@@ -834,18 +944,20 @@
                 if (winSide) {
                     celebrateWinner(winSide, winSide === 'red' ? 'red-box' : 'blue-box');
                 } else {
-                    // CẬP NHẬT TRẠNG THÁI HÒA LÊN FIREBASE ĐỂ TỰ ĐỘNG BẬT MENU CHỌN
                     matchRef.update({ needTieBreaker: true });
                 }
             }
         }
 
         function autoCheckTieBreak() {
+            // Ưu tiên 1: Xét tổng điểm ghi được từ các đòn 6 điểm và 4 điểm
             let rTech = (currentData.r6 || 0) * 6 + (currentData.r4 || 0) * 4;
             let bTech = (currentData.b6 || 0) * 6 + (currentData.b4 || 0) * 4;
             if (rTech > bTech) return 'red';
             if (bTech > rTech) return 'blue';
-            const checkOrder = [6, 4, 3, 2, 1];
+
+            // Ưu tiên 2, 3, 4: Bỏ qua đếm 6, 4. Bắt đầu đếm đòn 3 -> 2 -> 1
+            const checkOrder = [3, 2, 1];
             for (let p of checkOrder) {
                 let rCount = currentData['r' + p] || 0;
                 let bCount = currentData['b' + p] || 0;
@@ -856,7 +968,7 @@
         }
 
         function pickTieWinner(side) {
-            matchRef.update({ needTieBreaker: false }); // Tắt bảng chọn trên tất cả
+            matchRef.update({ needTieBreaker: false }); 
             celebrateWinner(side, side === 'red' ? 'red-box' : 'blue-box');
         }
 
@@ -887,7 +999,6 @@
                     let winSideTie = autoCheckTieBreak();
                     if (winSideTie) winSide = winSideTie;
                     if (!winSide) {
-                        // NẾU BẤM KẾT THÚC MÀ ĐANG HÒA TUYỆT ĐỐI -> GỌI BẢNG CHỌN
                         matchRef.update({ run: false, needTieBreaker: true });
                         return;
                     }
@@ -905,7 +1016,7 @@
                 rW:currentData.rW || 0,
                 round:(currentData.round || 1) + 1,
                 time:getSetMatchTime(),
-                run:false,isRest:false,
+                run:false,isRest:false, isKyeShi:false, savedMatchTime: 0,
                 rName:currentData.rName || "HONG",
                 bName:currentData.bName || "CHUNG",
                 rLogs:[],bLogs:[],
@@ -934,42 +1045,149 @@
             matchRef.update(currentData);
         }
 
+        // ==========================================
+        // CẬP NHẬT LOGIC TỔ HỢP ĐIỂM (BỘ ĐỆM 600ms)
+        // ==========================================
+        let refPendingHits = {};
+
         hitsRef.on('child_added', (snap) => {
             const hit = snap.val(); const hitKey = snap.key;
-            if (!hit || !currentData.run || currentData.isRest) return;
-            const now = Date.now();
-            if (currentData.oneRefMode) {
-                awardPointFromRef(hit.type[0], parseInt(hit.type.substring(1)), hit.refId);
-                db.ref('hits/' + hitKey).remove(); return;
-            }
-            recentHits.push({ ...hit, key: hitKey });
-            recentHits = recentHits.filter(h => (now - h.time) < 2000);
-            const matches = recentHits.filter(h => h.type === hit.type && h.refId !== hit.refId);
-            if (matches.length >= 1) {
-                const combinedRefs = hit.refId + "," + matches[0].refId;
-                awardPointFromRef(hit.type[0], parseInt(hit.type.substring(1)), combinedRefs);
-                db.ref('hits/' + hitKey).remove(); db.ref('hits/' + matches[0].key).remove();
-                recentHits = recentHits.filter(h => h.key !== hitKey && h.key !== matches[0].key);
+            if (!hit || !currentData.run || currentData.isRest || currentData.isKyeShi) return;
+            
+            db.ref('hits/' + hitKey).remove();
+
+            const refId = hit.refId;
+            const type = hit.type; // Nhận 'r1','r2','r3','rX' hoặc 'b1','b2','b3','bX'
+
+            if (!refPendingHits[refId]) refPendingHits[refId] = { hits: [], timer: null };
+            refPendingHits[refId].hits.push(type);
+
+            if (refPendingHits[refId].timer) clearTimeout(refPendingHits[refId].timer);
+
+            let rBase = refPendingHits[refId].hits.find(h => h.match(/^r[123]$/));
+            let rSpin = refPendingHits[refId].hits.find(h => h === 'rX');
+            let bBase = refPendingHits[refId].hits.find(h => h.match(/^b[123]$/));
+            let bSpin = refPendingHits[refId].hits.find(h => h === 'bX');
+
+            // Nếu nhận đủ Combo (Đá + Xoay) của 1 bên thì xử lý ngay lập tức
+            if ((rBase && rSpin) || (bBase && bSpin)) {
+                resolveRefHit(refId);
+            } else {
+                // Nếu chưa đủ, đợi 600ms xem có bấm thêm nút xoay không
+                refPendingHits[refId].timer = setTimeout(() => {
+                    resolveRefHit(refId);
+                }, 600);
             }
         });
 
+        function resolveRefHit(refId) {
+            if (!refPendingHits[refId] || refPendingHits[refId].hits.length === 0) return;
+            
+            let hits = refPendingHits[refId].hits;
+            refPendingHits[refId].hits = []; 
+
+            // Phân tích ĐỎ
+            let rBase = hits.slice().reverse().find(h => h.match(/^r[123]$/));
+            let rSpin = hits.find(h => h === 'rX');
+            if (rBase) {
+                let pts = parseInt(rBase[1]);
+                if (rSpin) {
+                    if (pts === 2) pts = 4;
+                    if (pts === 3) pts = 6;
+                }
+                forwardToMatcher('r' + pts, refId);
+            }
+
+            // Phân tích XANH
+            let bBase = hits.slice().reverse().find(h => h.match(/^b[123]$/));
+            let bSpin = hits.find(h => h === 'bX');
+            if (bBase) {
+                let pts = parseInt(bBase[1]);
+                if (bSpin) {
+                    if (pts === 2) pts = 4;
+                    if (pts === 3) pts = 6;
+                }
+                forwardToMatcher('b' + pts, refId);
+            }
+        }
+
+        function forwardToMatcher(type, refId) {
+            if (currentData.oneRefMode) {
+                awardPointFromRef(type[0], parseInt(type.substring(1)), refId);
+                return;
+            }
+            const now = Date.now();
+            recentHits.push({ type: type, refId: refId, time: now, key: Math.random().toString() });
+            recentHits = recentHits.filter(h => (now - h.time) < 2000); 
+            const matches = recentHits.filter(h => h.type === type && h.refId !== refId);
+            if (matches.length >= 1) {
+                const combinedRefs = refId + "," + matches[0].refId;
+                awardPointFromRef(type[0], parseInt(type.substring(1)), combinedRefs);
+                recentHits = recentHits.filter(h => h.refId !== refId && h.refId !== matches[0].refId);
+            }
+        }
+        // ==========================================
+
+        // ==========================================
+        // CẬP NHẬT LOGIC NÚT XOAY CHO THƯ KÝ
+        // ==========================================
+        let redXoayActive = false;
+        let blueXoayActive = false;
+
+        function toggleXoay(side) {
+            if (side === 'r') {
+                redXoayActive = !redXoayActive;
+                document.getElementById('btn-xoay-r').style.background = redXoayActive ? '#d4af37' : '#444';
+                document.getElementById('btn-xoay-r').style.color = redXoayActive ? 'black' : 'white';
+            } else {
+                blueXoayActive = !blueXoayActive;
+                document.getElementById('btn-xoay-b').style.background = blueXoayActive ? '#d4af37' : '#444';
+                document.getElementById('btn-xoay-b').style.color = blueXoayActive ? 'black' : 'white';
+            }
+        }
+
         function addPointDirect(field, pts) { 
             const side = field[0]; 
-            currentData[field] += pts; 
-            currentData[side + pts] = (currentData[side + pts] || 0) + 1;
+            let finalPts = pts;
+            
+            if (side === 'r' && redXoayActive) {
+                if (pts === 2) finalPts = 4;
+                if (pts === 3) finalPts = 6;
+                toggleXoay('r'); // Tự tắt sau khi dùng
+            } else if (side === 'b' && blueXoayActive) {
+                if (pts === 2) finalPts = 4;
+                if (pts === 3) finalPts = 6;
+                toggleXoay('b'); // Tự tắt sau khi dùng
+            }
+
+            currentData[field] += finalPts; 
+            currentData[side + finalPts] = (currentData[side + finalPts] || 0) + 1;
             if (!currentData[side + 'Logs']) currentData[side + 'Logs'] = [];
-            currentData[side + 'Logs'].push(pts + " (Thư ký)");
+            currentData[side + 'Logs'].push(finalPts + " (Thư ký)");
             matchRef.update(currentData); 
         }
 
         function subPointDirect(field, pts) {
             const side = field[0];
-            if (currentData[field] >= pts) {
-                currentData[field] -= pts;
-                if (currentData[side + pts] > 0) { currentData[side + pts]--; }
+            let finalPts = pts;
+
+            if (side === 'r' && redXoayActive) {
+                if (pts === 2) finalPts = 4;
+                if (pts === 3) finalPts = 6;
+                toggleXoay('r'); 
+            } else if (side === 'b' && blueXoayActive) {
+                if (pts === 2) finalPts = 4;
+                if (pts === 3) finalPts = 6;
+                toggleXoay('b');
+            }
+
+            if (currentData[field] >= finalPts) {
+                currentData[field] -= finalPts;
+                if (currentData[side + finalPts] > 0) { currentData[side + finalPts]--; }
                 matchRef.update(currentData);
             }
         }
+        // ==========================================
 
         function updateLogs(side, logs) {
             const container = document.getElementById(side + '-logs'); container.innerHTML = '';
@@ -980,35 +1198,14 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        function checkVictoryConditions() {
-            if (currentData.winnerDeclared || currentData.isRest) return;
-            const mPts = Number(currentData.maxPts);
-            const mGj = Number(currentData.maxGj);
-            if (currentData.gapEnabled && Math.abs(currentData.rS - currentData.bS) >= 15) {
-                celebrateWinner(currentData.rS > currentData.bS ? 'red' : 'blue', currentData.rS > currentData.bS ? 'red-box' : 'blue-box', true);
-            }
-            if (mPts > 0) {
-                if (currentData.rS >= mPts) celebrateWinner('red', 'red-box');
-                else if (currentData.bS >= mPts) celebrateWinner('blue', 'blue-box');
-            }
-            if (mGj > 0) {
-                if (currentData.rG >= mGj) celebrateWinner('blue', 'blue-box');
-                else if (currentData.bG >= mGj) celebrateWinner('red', 'red-box');
-            }
-        }
-
-        // ==========================================
-        // CẬP NHẬT LOGIC LỖI 10 GIÂY CUỐI 
-        // ==========================================
-        let pendingGjSide = null; // Biến lưu trữ người đang bị chọn lỗi
+        let pendingGjSide = null;
 
         function addGj(f) { 
-            // Nếu thời gian dưới 10s và đang trong hiệp đấu (không phải giờ nghỉ)
-            if (currentData.time < 10 && currentData.time > 0 && !currentData.isRest) {
+            if (currentData.time < 10 && currentData.time > 0 && !currentData.isRest && !currentData.isKyeShi) {
                 pendingGjSide = f;
                 document.getElementById('gj-selection-ui').style.display = 'flex';
             } else {
-                executeGj(f, 1); // Bình thường cộng 1 điểm cho đối phương
+                executeGj(f, 1);
             }
         }
 
@@ -1025,12 +1222,9 @@
         }
 
         function executeGj(f, oppPts) {
-            currentData[f] += 1; // Cộng 1 lỗi cho người vi phạm
+            currentData[f] += 1; 
             const opp = f === 'bG' ? 'r' : 'b'; 
-            currentData[opp + 'S'] += oppPts; // Cộng điểm tương ứng cho đối phương
-            
-            // Đã bỏ phần ghi log hành động lỗi (Gam-jeom) vào cột điểm theo yêu cầu
-            
+            currentData[opp + 'S'] += oppPts; 
             matchRef.update(currentData);
         }
         
@@ -1041,7 +1235,6 @@
                 matchRef.update(currentData); 
             } 
         }
-        // ==========================================
 
         function updateRefPassword(id) { db.ref('referee_passwords/' + id).set(document.getElementById('pw-' + id).value); }
         function updateTopTitle() { matchRef.update({ topTitle: document.getElementById('in-top-title').value }); }
@@ -1049,8 +1242,25 @@
         function updateRules() { matchRef.update({ maxGj: Number(document.getElementById('in-max-gj').value), maxPts: Number(document.getElementById('in-max-pts').value) }); }
         function updateNames() { matchRef.update({ rName: document.getElementById('in-r-name').value || currentData.rName, bName: document.getElementById('in-b-name').value || currentData.bName }); }
         function updateMatchNum() { matchRef.update({ matchNum: parseInt(document.getElementById('in-match-num').value) || 1 }); }
-        function setCustomTime() { matchRef.update({ time: getSetMatchTime(), isRest: false }); }
-        function setRestTime() { matchRef.update({ time: (parseInt(document.getElementById('in-rest-min').value)*60) + parseInt(document.getElementById('in-rest-sec').value), isRest: true, run: false }); }
+        
+        function setCustomTime() { 
+            if (currentData.isKyeShi && currentData.savedMatchTime !== undefined) {
+                matchRef.update({ time: currentData.savedMatchTime, isRest: false, isKyeShi: false, run: false });
+            } else {
+                matchRef.update({ time: getSetMatchTime(), isRest: false, isKyeShi: false, run: false }); 
+            }
+        }
+        
+        function setRestTime() { matchRef.update({ time: (parseInt(document.getElementById('in-rest-min').value)*60) + parseInt(document.getElementById('in-rest-sec').value), isRest: true, run: false, isKyeShi: false }); }
+        
+        function setKyeShiTime() { 
+            let timeToSave = currentData.time;
+            if (currentData.isKyeShi) {
+                timeToSave = currentData.savedMatchTime;
+            }
+            matchRef.update({ time: 60, savedMatchTime: timeToSave, isRest: false, isKyeShi: true, run: true }); 
+        }
+
         function toggleGap() { matchRef.update({ gapEnabled: document.getElementById('gap-toggle').checked }); }
         function flash(id, className) { const el = document.getElementById(id); el.classList.remove('flash', 'flash-winner'); void el.offsetWidth; el.classList.add(className); }
         
@@ -1067,7 +1277,7 @@
                 matchRef.set({
                     bS:0,rS:0,bG:0,rG:0,bW:0,rW:0,round:1,
                     time:getSetMatchTime() || 120,
-                    run:false,isRest:false,
+                    run:false,isRest:false, isKyeShi:false, savedMatchTime: 0,
                     rName:currentData.rName || "HONG",
                     bName:currentData.bName || "CHUNG",
                     rLogs:[],bLogs:[],
