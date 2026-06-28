@@ -886,6 +886,8 @@
             else if (!data.run && timerInterval) { stopLocalTimer(); currentData.time = data.time; updateTimerDisplay(currentData.time); }
             if (!data.run) { currentData.time = data.time; updateTimerDisplay(data.time); }
             currentData = data;
+
+            // ĐÃ BỔ SUNG GỌI HÀM KIỂM TRA ĐIỀU KIỆN THẮNG Ở ĐÂY
             checkVictoryConditions();
         });
 
@@ -932,6 +934,43 @@
 
         function stopLocalTimer() { clearInterval(timerInterval); timerInterval = null; }
 
+        // ĐÃ KHÔI PHỤC HÀM KIỂM TRA ĐIỀU KIỆN THẮNG (MAX ĐIỂM, MAX LỖI, CÁCH BIỆT PTG)
+        function checkVictoryConditions() {
+            if (currentData.winnerDeclared) return;
+
+            let rWin = false;
+            let bWin = false;
+            let isPtg = false;
+
+            // 1. Kiểm tra Max Lỗi (Gam-jeom)
+            if (currentData.maxGj > 0) {
+                if (currentData.rG >= currentData.maxGj) bWin = true;
+                if (currentData.bG >= currentData.maxGj) rWin = true;
+            }
+
+            // 2. Kiểm tra Max Điểm
+            if (!rWin && !bWin && currentData.maxPts > 0) {
+                if (currentData.rS >= currentData.maxPts) rWin = true;
+                if (currentData.bS >= currentData.maxPts) bWin = true;
+            }
+
+            // 3. Kiểm tra Cách biệt 15 điểm (Chỉ kích hoạt nếu nút PTG được chọn)
+            if (!rWin && !bWin && currentData.gapEnabled) {
+                if (currentData.rS - currentData.bS >= 15) {
+                    rWin = true;
+                    isPtg = true;
+                }
+                if (currentData.bS - currentData.rS >= 15) {
+                    bWin = true;
+                    isPtg = true;
+                }
+            }
+
+            if (rWin && bWin) return; 
+            if (rWin) celebrateWinner('red', 'red-box', isPtg);
+            if (bWin) celebrateWinner('blue', 'blue-box', isPtg);
+        }
+
         function handleAutoTimeUp() {
             if (currentData.winnerDeclared) return;
             matchRef.update({ run: false, time: 0 });
@@ -950,13 +989,11 @@
         }
 
         function autoCheckTieBreak() {
-            // Ưu tiên 1: Xét tổng điểm ghi được từ các đòn 6 điểm và 4 điểm
             let rTech = (currentData.r6 || 0) * 6 + (currentData.r4 || 0) * 4;
             let bTech = (currentData.b6 || 0) * 6 + (currentData.b4 || 0) * 4;
             if (rTech > bTech) return 'red';
             if (bTech > rTech) return 'blue';
 
-            // Ưu tiên 2, 3, 4: Bỏ qua đếm 6, 4. Bắt đầu đếm đòn 3 -> 2 -> 1
             const checkOrder = [3, 2, 1];
             for (let p of checkOrder) {
                 let rCount = currentData['r' + p] || 0;
@@ -1045,9 +1082,6 @@
             matchRef.update(currentData);
         }
 
-        // ==========================================
-        // CẬP NHẬT LOGIC TỔ HỢP ĐIỂM (BỘ ĐỆM 600ms)
-        // ==========================================
         let refPendingHits = {};
 
         hitsRef.on('child_added', (snap) => {
@@ -1057,7 +1091,7 @@
             db.ref('hits/' + hitKey).remove();
 
             const refId = hit.refId;
-            const type = hit.type; // Nhận 'r1','r2','r3','rX' hoặc 'b1','b2','b3','bX'
+            const type = hit.type; 
 
             if (!refPendingHits[refId]) refPendingHits[refId] = { hits: [], timer: null };
             refPendingHits[refId].hits.push(type);
@@ -1069,11 +1103,9 @@
             let bBase = refPendingHits[refId].hits.find(h => h.match(/^b[123]$/));
             let bSpin = refPendingHits[refId].hits.find(h => h === 'bX');
 
-            // Nếu nhận đủ Combo (Đá + Xoay) của 1 bên thì xử lý ngay lập tức
             if ((rBase && rSpin) || (bBase && bSpin)) {
                 resolveRefHit(refId);
             } else {
-                // Nếu chưa đủ, đợi 600ms xem có bấm thêm nút xoay không
                 refPendingHits[refId].timer = setTimeout(() => {
                     resolveRefHit(refId);
                 }, 600);
@@ -1086,7 +1118,6 @@
             let hits = refPendingHits[refId].hits;
             refPendingHits[refId].hits = []; 
 
-            // Phân tích ĐỎ
             let rBase = hits.slice().reverse().find(h => h.match(/^r[123]$/));
             let rSpin = hits.find(h => h === 'rX');
             if (rBase) {
@@ -1098,7 +1129,6 @@
                 forwardToMatcher('r' + pts, refId);
             }
 
-            // Phân tích XANH
             let bBase = hits.slice().reverse().find(h => h.match(/^b[123]$/));
             let bSpin = hits.find(h => h === 'bX');
             if (bBase) {
@@ -1126,11 +1156,7 @@
                 recentHits = recentHits.filter(h => h.refId !== refId && h.refId !== matches[0].refId);
             }
         }
-        // ==========================================
 
-        // ==========================================
-        // CẬP NHẬT LOGIC NÚT XOAY CHO THƯ KÝ
-        // ==========================================
         let redXoayActive = false;
         let blueXoayActive = false;
 
@@ -1153,11 +1179,11 @@
             if (side === 'r' && redXoayActive) {
                 if (pts === 2) finalPts = 4;
                 if (pts === 3) finalPts = 6;
-                toggleXoay('r'); // Tự tắt sau khi dùng
+                toggleXoay('r');
             } else if (side === 'b' && blueXoayActive) {
                 if (pts === 2) finalPts = 4;
                 if (pts === 3) finalPts = 6;
-                toggleXoay('b'); // Tự tắt sau khi dùng
+                toggleXoay('b');
             }
 
             currentData[field] += finalPts; 
@@ -1187,7 +1213,6 @@
                 matchRef.update(currentData);
             }
         }
-        // ==========================================
 
         function updateLogs(side, logs) {
             const container = document.getElementById(side + '-logs'); container.innerHTML = '';
